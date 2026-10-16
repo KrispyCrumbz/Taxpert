@@ -10,7 +10,7 @@ Deductly is a browser-based Australian tax return helper designed to help users 
 Built with HTML, CSS and vanilla JavaScript, the project uses a lightweight client-side architecture without a backend, build step or installation requirements.
 
 <p align="left">
-  <a href="https://krispycrumbz.github.io/Taxpert/">
+  <a href="https://krispycrumbz.github.io/Taxpert/Deductly">
     <img src="https://img.shields.io/badge/Live%20Demo-Try%20Deductly-185034?style=flat-square" alt="Live demo">
   </a>
   <img src="https://img.shields.io/badge/HTML5-Markup-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5">

@@ -615,6 +615,156 @@ class Component extends DCLogic {
     const copied = this.state && this.state.copied;
     const done = (ok) => this.setState({ copied: ok ? 'yes' : 'no' });
 
+    // ---- spreadsheet export (CSV): profile, expenses, lodgement amounts and the estimate
+    /**
+     * Spreadsheet export (CSV): profile, expenses, lodgement amounts and the estimate,
+     * in one file that opens in Excel or Google Sheets.
+     */
+    const pad2 = (x) => (x < 10 ? '0' : '') + x;
+    const isoToday = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate());
+
+    /**
+     * Quotes one CSV field. Fields containing commas, quotes or line breaks are wrapped in quotes.
+     * A leading = + - or @ is neutralised so a spreadsheet never runs user text as a formula.
+     */
+    const q = (v) => {
+      let s = String(v == null ? '' : v);
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+
+    // Money as plain numbers with two decimals, so spreadsheets can sum them.
+    const n2 = (v) => (Math.round(v * 100) / 100).toFixed(2);
+    const csvRow = (cells) => cells.join(',');
+    const csv = [];
+    csv.push(csvRow([q('Deductly summary'), q('2025-26 income year')]));
+    csv.push(csvRow([q('Exported'), q(isoToday)]));
+    csv.push(
+      csvRow([
+        q('Note'),
+        q('Estimates only. The ATO works out your actual result when you lodge.'),
+      ]),
+    );
+    csv.push('');
+    csv.push(q('TAX PROFILE'));
+    csv.push(csvRow([q('Item'), q('Answer')]));
+    csv.push(csvRow([q('Income source'), q(sitLabels[p.situation] || '')]));
+    csv.push(csvRow([q('Residency'), q(resLabels[p.residency] || '')]));
+    csv.push(csvRow([q('Relationship'), q(relLabels[p.relationship] || '')]));
+    if (p.relationship === 'married')
+      csv.push(csvRow([q("Spouse's taxable income"), n2(num(p.spouseIncome))]));
+    csv.push(csvRow([q('Dependent children'), String(children)]));
+    csv.push(csvRow([q('Other dependants'), String(others)]));
+    csv.push(csvRow([q('Medicare levy full exemption days'), String(num(p.fullDays))]));
+    csv.push(csvRow([q('Medicare levy half exemption days'), String(num(p.halfDays))]));
+    csv.push(
+      csvRow([q('Private hospital cover'), q(coverText === 'Not answered' ? '' : coverText)]),
+    );
+    csv.push(
+      csvRow([
+        q('Study or training loan'),
+        q(p.loan === 'yes' ? 'Yes' : p.loan === 'no' ? 'No' : ''),
+      ]),
+    );
+    csv.push(csvRow([q('Salary and wages'), n2(num(p.salary))]));
+    if (showBusiness) csv.push(csvRow([q('Business income'), n2(num(p.business))]));
+    csv.push(csvRow([q('Bank interest'), n2(num(p.interest))]));
+    csv.push(csvRow([q('Dividends'), n2(num(p.dividends))]));
+    csv.push(csvRow([q('Other income'), n2(num(p.other))]));
+    csv.push(csvRow([q('Total income'), n2(income)]));
+    csv.push(csvRow([q('Tax withheld'), n2(num(p.withheld))]));
+    csv.push('');
+    csv.push(q('EXPENSES'));
+    csv.push(
+      csvRow(
+        [
+          'Date',
+          'Category code',
+          'Category',
+          'Description',
+          'Amount paid',
+          'Work use %',
+          'Paid by me',
+          'Have record',
+          'Claimable amount',
+          'Status',
+        ].map(q),
+      ),
+    );
+    [...ex.items]
+      .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+      .forEach((it) => {
+        const amt = parseFloat(it.amount) || 0;
+        const pct = Math.max(0, Math.min(100, parseInt(it.pct, 10) || 0));
+        const claim = it.paid ? (amt * pct) / 100 : 0;
+        const c = cats.find((x) => x.id === it.cat) || { code: '', name: '' };
+        const status = !it.paid
+          ? 'Paid back to you, not claimable'
+          : it.record
+            ? 'Ready to claim'
+            : 'Needs a record';
+        csv.push(
+          csvRow([
+            q(it.date),
+            q(c.code),
+            q(c.name),
+            q(it.desc),
+            n2(amt),
+            String(pct),
+            q(it.paid ? 'Yes' : 'No'),
+            q(it.record ? 'Yes' : 'No'),
+            n2(claim),
+            q(status),
+          ]),
+        );
+      });
+    csv.push('');
+    csv.push(q('AMOUNTS FOR LODGEMENT'));
+    csv.push(csvRow(['Label', 'Category', 'Items', 'Ready to claim', 'Needs a record'].map(q)));
+    cats.forEach((c) => {
+      if ((countBy[c.id] || 0) > 0)
+        csv.push(
+          csvRow([
+            q(c.code),
+            q(c.name),
+            String(countBy[c.id]),
+            n2(readyBy[c.id] || 0),
+            n2(pendingBy[c.id] || 0),
+          ]),
+        );
+    });
+    csv.push(csvRow([q('Total'), '', String(counted), n2(ready), n2(pending)]));
+    csv.push('');
+    csv.push(q('ESTIMATE'));
+    if (refundOn) {
+      csv.push(csvRow([q('Item'), q('Amount')]));
+      csv.push(csvRow([q('Taxable income after deductions'), n2(taxableAfter)]));
+      csv.push(csvRow([q('Income tax'), n2(grossTax)]));
+      if (offset >= 1) csv.push(csvRow([q('Low income tax offset'), n2(-offset)]));
+      csv.push(csvRow([q('Medicare levy'), n2(medAfter.levy)]));
+      if (medAfter.mls >= 1) csv.push(csvRow([q('Medicare levy surcharge'), n2(medAfter.mls)]));
+      if (loanAfter >= 1) csv.push(csvRow([q('Study loan repayment'), n2(loanAfter)]));
+      csv.push(csvRow([q('Total tax and levies'), n2(payable)]));
+      csv.push(csvRow([q('Tax already withheld'), n2(withheldAmt)]));
+      csv.push(
+        csvRow([
+          q(isRefund ? 'Estimated refund' : 'Estimated amount to pay'),
+          n2(Math.abs(result)),
+        ]),
+      );
+      if (estimateOn) csv.push(csvRow([q('Estimated tax saving from deductions'), n2(savingNow)]));
+    } else {
+      csv.push(csvRow([q('Not available'), q(refundOffNote)]));
+    }
+
+    /**
+     * The file contents: a byte order mark first so Excel reads accents correctly, and CRLF line
+     * endings.
+     */
+    const csvText = '\uFEFF' + csv.join('\r\n') + '\r\n';
+    const exportState = this.state && this.state.exportState;
+    const setExport = (v) => this.setState({ exportState: v });
+
     return {
       usingSample: usingSample,
       checks: checkRows,
@@ -644,6 +794,28 @@ class Component extends DCLogic {
       hasMore: more >= 1,
       moreText: money(more),
       dueText: dueText,
+      exportSaved: exportState === 'saved',
+      exportFailed: exportState === 'failed',
+      // Downloads spreadsheet.csv straight from the browser: no server involved
+      // Downloads the file straight from the browser: nothing is sent to a server.
+      saveCsv: () => {
+        try {
+          const url = URL.createObjectURL(new Blob([csvText], { type: 'text/csv;charset=utf-8' }));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'deductly-2025-26-summary.csv';
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          window.setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 1500);
+          setExport('saved');
+        } catch (e) {
+          setExport('failed');
+        }
+      },
       copyOk: copied === 'yes',
       copyFail: copied === 'no',
 

@@ -575,6 +575,22 @@ Logic and tax calculations: js/review.js.
                   <span style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px">
                     <button
                       type="button"
+                      onClick="{{ saveCsv }}"
+                      style="
+                        background: #185034;
+                        color: #ffffff;
+                        border: 0;
+                        border-radius: 10px;
+                        padding: 11px 16px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        cursor: pointer;
+                      "
+                    >
+                      Save as spreadsheet
+                    </button>
+                    <button
+                      type="button"
                       onClick="{{ copy }}"
                       style="
                         background: #ffffff;
@@ -590,6 +606,24 @@ Logic and tax calculations: js/review.js.
                       Copy summary
                     </button>
                   </span>
+                  <sc-if
+                    value="{{ exportSaved }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #0e5a3f; font-weight: 600"
+                      >Spreadsheet saved</span
+                    ></sc-if
+                  >
+                  <sc-if
+                    value="{{ exportFailed }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #9a2a12; font-weight: 600"
+                      >Couldn't save the file. Try another browser.</span
+                    ></sc-if
+                  >
                   <sc-if
                     value="{{ copyOk }}"
                     hint-placeholder-val="{{ false }}"

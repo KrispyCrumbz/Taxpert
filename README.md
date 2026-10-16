@@ -1,9 +1,12 @@
 # Deductly
 
+<p align="center">
+  <img src="Deductly/assets/logo-primary.svg" alt="Deductly logo" width="220">
+</p>
+
 **A simpler way to prepare for tax time.**
 
 Deductly is a browser-based Australian tax return helper designed to help users organise their expenses, review potential deductions and estimate their tax outcome before lodging a return.
-
 Built with HTML, CSS and vanilla JavaScript, the project uses a lightweight client-side architecture without a backend, build step or installation requirements.
 
 <p align="left">

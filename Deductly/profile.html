@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <!--
+Deductly: step 1 of 3, tax profile.
+Collects income, residency, relationship, dependants, Medicare exemption days, hospital cover
+and study loan. Answers are saved to the browser as the user types (localStorage key
+"deductly:profile"). Logic: js/profile.js.
+-->
+    <meta charset="utf-8" />
+    <title>Your tax profile · Deductly</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/logo-icon.svg"
+    />
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+        />
+        <style>
+          body {
+            margin: 0;
+            background: #f3f5f1;
+            -webkit-font-smoothing: antialiased;
+          }
+          button {
+            font: inherit;
+            color: inherit;
+          }
+          :focus-visible {
+            outline: 3px solid #2f6feb;
+            outline-offset: 3px;
+          }
+          .fld:focus-within {
+            outline: 3px solid #2f6feb;
+            outline-offset: 2px;
+          }
+          .fld input:focus-visible {
+            outline: none;
+          }
+          a.navlink:hover {
+            text-decoration: underline;
+          }
+          .logo-lg {
+            display: block;
+          }
+          .logo-sm {
+            display: none;
+          }
+          @media (max-width: 480px) {
+            .logo-lg {
+              display: none;
+            }
+            .logo-sm {
+              display: block;
+            }
+          }
+          button:disabled {
+            cursor: not-allowed;
+          }
+        </style>
+      </helmet>
+
+      <div
+        id="top"
+        style="
+          background: #f3f5f1;
+          color: #11231c;
+          font-family: 'Hanken Grotesk', system-ui, sans-serif;
+          font-size: 17px;
+          line-height: 1.55;
+        "
+      >
+        <!-- Header -->
+        <header
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+          "
+        >
+          <a
+            href="index.html"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              text-decoration: none;
+              color: #11231c;
+            "
+          >
+            <img
+              class="logo-lg"
+              src="assets/logo-primary.svg"
+              alt="Deductly"
+              style="height: 40px; width: auto"
+            />
+            <img
+              class="logo-sm"
+              src="assets/logo-icon.svg"
+              alt="Deductly"
+              style="height: 36px; width: auto"
+            />
+          </a>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span
+              style="display: flex; gap: 6px"
+              aria-hidden="true"
+            >
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #185034"
+              ></span>
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #c5d0c8"
+              ></span>
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #c5d0c8"
+              ></span>
+            </span>
+            <span
+              style="
+                font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                font-weight: 500;
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #4f6158;
+              "
+              >Step 1 of 3</span
+            >
+          </div>
+        </header>
+
+        <!-- Title -->
+        <section
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          "
+        >
+          <a
+            class="navlink"
+            href="index.html"
+            style="color: #185034; font-weight: 600; font-size: 15px; text-decoration: none"
+            >← Back to home</a
+          >
+          <p
+            style="
+              margin: 0;
+              font-family: 'IBM Plex Mono', ui-monospace, monospace;
+              font-weight: 500;
+              font-size: 12px;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+              color: #185034;
+            "
+          >
+            2025–26 income year
+          </p>
+          <h1
+            style="
+              margin: 0;
+              font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+              font-weight: 700;
+              font-size: clamp(36px, 5vw, 56px);
+              line-height: 1.04;
+              letter-spacing: -0.03em;
+              text-wrap: balance;
+            "
+          >
+            Your tax profile
+          </h1>
+          <p style="margin: 0; max-width: 620px; font-size: 19px; color: #2c4036">
+            These answers decide which deductions, offsets and levies apply to you. Deductly doesn't
+            send anything to the ATO.
+          </p>
+
+          <sc-if
+            value="{{ showSample }}"
+            hint-placeholder-val="{{ true }}"
+          >
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px 16px;
+                background: #fbf0c9;
+                border: 1px solid #e6cd7a;
+                border-radius: 12px;
+                padding: 12px 16px;
+                max-width: 100%;
+                box-sizing: border-box;
+              "
+            >
+              <span style="font-size: 15px; color: #4a3a00; flex: 1 1 320px; min-width: 0"
+                >Sample answers are filled in so you can see how this page works. Replace them with
+                your own.</span
+              >
+              <button
+                type="button"
+                onClick="{{ clearAll }}"
+                style="
+                  background: #11231c;
+                  color: #ffffff;
+                  border: 0;
+                  border-radius: 8px;
+                  padding: 9px 16px;
+                  font-weight: 600;
+                  font-size: 14px;
+                  cursor: pointer;
+                "
+              >
+                Clear sample answers
+              </button>
+            </div>
+          </sc-if>
+
+          <sc-if
+            value="{{ storageOk }}"
+            hint-placeholder-val="{{ true }}"
+          >
+            <p
+              style="
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                color: #4f6158;
+              "
+            >
+              <span
+                aria-hidden="true"
+                style="
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 50%;
+                  background: #2e8b57;
+                  display: inline-block;
+                "
+              ></span
+              >Your answers save on this device as you type.
+            </p>
+          </sc-if>
+          <sc-if
+            value="{{ storageBlocked }}"
+            hint-placeholder-val="{{ false }}"
+          >
+            <p
+              role="status"
+              style="
+                margin: 0;
+                font-size: 14px;
+                font-weight: 600;
+                color: #9a2a12;
+                background: #fce9e3;
+                border-radius: 8px;
+                padding: 10px 14px;
+              "
+            >
+              This browser is blocking storage, so your answers won't be saved if you leave or close
+              the page.
+            </p>
+          </sc-if>
+        </section>
+
+        <!-- Form + summary -->
+        <section
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 96px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 32px;
+          "
+        >
+          <div
+            style="flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px"
+          >
+            <!-- How you earn -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Required</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  How do you earn your income?
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  This sets which deduction categories you see.
+                </p>
+              </div>
+              <div
+                role="group"
+                aria-label="How you earn your income"
+                style="display: flex; flex-wrap: wrap; gap: 12px"
+              >
+                <sc-for
+                  list="{{ situationOpts }}"
+                  as="opt"
+                  hint-placeholder-count="3"
+                >
+                  <button
+                    type="button"
+                    onClick="{{ opt.pick }}"
+                    aria-pressed="{{ opt.pressed }}"
+                    style="{{ opt.style }}"
+                  >
+                    <span style="font-weight: 600; font-size: 16px">{{ opt.label }}</span>
+                    <sc-if
+                      value="{{ opt.hasDesc }}"
+                      hint-placeholder-val="{{ true }}"
+                      ><span style="font-size: 14px; color: #4f6158">{{ opt.desc }}</span></sc-if
+                    >
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Residency -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Required</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Residency for tax purposes
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  Residency changes the tax rates and whether the Medicare levy applies.
+                </p>
+              </div>
+              <div
+                role="group"
+                aria-label="Residency for tax purposes"
+                style="display: flex; flex-wrap: wrap; gap: 12px"
+              >
+                <sc-for
+                  list="{{ residencyOpts }}"
+                  as="opt"
+                  hint-placeholder-count="3"
+                >
+                  <button
+                    type="button"
+                    onClick="{{ opt.pick }}"
+                    aria-pressed="{{ opt.pressed }}"
+                    style="{{ opt.style }}"
+                  >
+                    <span style="font-weight: 600; font-size: 16px">{{ opt.label }}</span>
+                    <sc-if
+                      value="{{ opt.hasDesc }}"
+                      hint-placeholder-val="{{ true }}"
+                      ><span style="font-size: 14px; color: #4f6158">{{ opt.desc }}</span></sc-if
+                    >
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Income -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Income</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  What did you earn in 2025–26?
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  Your employer's income statement in myGov shows salary and tax withheld. Round to
+                  the nearest dollar.
+                </p>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 20px 20px">
+                <sc-for
+                  list="{{ incomeFields }}"
+                  as="fld"
+                  hint-placeholder-count="5"
+                >
+                  <div
+                    style="
+                      flex: 1 1 240px;
+                      min-width: 0;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 6px;
+                    "
+                  >
+                    <label
+                      for="{{ fld.id }}"
+                      style="font-weight: 600; font-size: 15px"
+                      >{{ fld.label }}</label
+                    >
+                    <div
+                      class="fld"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        border: 1px solid #8fa096;
+                        border-radius: 10px;
+                        background: #ffffff;
+                        padding: 0 14px;
+                      "
+                    >
+                      <span
+                        aria-hidden="true"
+                        style="
+                          color: #4f6158;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                        "
+                        >$</span
+                      >
+                      <input
+                        id="{{ fld.id }}"
+                        type="text"
+                        value="{{ fld.value }}"
+                        placeholder="0"
+                        onChange="{{ fld.change }}"
+                        style="
+                          flex: 1 1 auto;
+                          min-width: 0;
+                          border: 0;
+                          background: transparent;
+                          padding: 13px 0;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 16px;
+                          color: #11231c;
+                        "
+                      />
+                    </div>
+                    <span style="font-size: 13px; color: #4f6158">{{ fld.hint }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Family -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Required</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Relationship and dependants
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  Family details affect the Medicare levy thresholds and some offsets.
+                </p>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <span style="font-weight: 600; font-size: 15px"
+                  >Relationship status on 30 June 2026</span
+                >
+                <div
+                  role="group"
+                  aria-label="Relationship status"
+                  style="display: flex; flex-wrap: wrap; gap: 12px"
+                >
+                  <sc-for
+                    list="{{ relationshipOpts }}"
+                    as="opt"
+                    hint-placeholder-count="4"
+                  >
+                    <button
+                      type="button"
+                      onClick="{{ opt.pick }}"
+                      aria-pressed="{{ opt.pressed }}"
+                      style="{{ opt.style }}"
+                    >
+                      <span style="font-weight: 600; font-size: 16px">{{ opt.label }}</span>
+                      <sc-if
+                        value="{{ opt.hasDesc }}"
+                        hint-placeholder-val="{{ false }}"
+                        ><span style="font-size: 14px; color: #4f6158">{{ opt.desc }}</span></sc-if
+                      >
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <sc-if
+                value="{{ showSpouse }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div style="max-width: 320px; display: flex; flex-direction: column; gap: 6px">
+                  <label
+                    for="spouse-income"
+                    style="font-weight: 600; font-size: 15px"
+                    >Your spouse's taxable income</label
+                  >
+                  <div
+                    class="fld"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      border: 1px solid #8fa096;
+                      border-radius: 10px;
+                      background: #ffffff;
+                      padding: 0 14px;
+                    "
+                  >
+                    <span
+                      aria-hidden="true"
+                      style="
+                        color: #4f6158;
+                        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                        font-weight: 500;
+                      "
+                      >$</span
+                    >
+                    <input
+                      id="spouse-income"
+                      type="text"
+                      value="{{ spouseIncome }}"
+                      placeholder="0"
+                      onChange="{{ onSpouseIncome }}"
+                      style="
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        border: 0;
+                        background: transparent;
+                        padding: 13px 0;
+                        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                        font-weight: 500;
+                        font-size: 16px;
+                        color: #11231c;
+                      "
+                    />
+                  </div>
+                  <span style="font-size: 13px; color: #4f6158"
+                    >An estimate is fine. It sets your family income for the Medicare levy and
+                    surcharge.</span
+                  >
+                </div>
+              </sc-if>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 24px 32px">
+                <sc-for
+                  list="{{ steppers }}"
+                  as="st"
+                  hint-placeholder-count="2"
+                >
+                  <div
+                    style="
+                      flex: 1 1 260px;
+                      min-width: 0;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 8px;
+                    "
+                  >
+                    <span style="font-weight: 600; font-size: 15px">{{ st.label }}</span>
+                    <div style="display: flex; align-items: center; gap: 12px">
+                      <button
+                        type="button"
+                        onClick="{{ st.dec }}"
+                        aria-label="Fewer {{ st.noun }}"
+                        style="
+                          flex: none;
+                          width: 44px;
+                          height: 44px;
+                          border-radius: 10px;
+                          border: 1px solid #8fa096;
+                          background: #ffffff;
+                          font-size: 22px;
+                          line-height: 1;
+                          cursor: pointer;
+                        "
+                      >
+                        −
+                      </button>
+                      <span
+                        aria-live="polite"
+                        style="
+                          min-width: 36px;
+                          text-align: center;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 22px;
+                        "
+                        >{{ st.value }}</span
+                      >
+                      <button
+                        type="button"
+                        onClick="{{ st.inc }}"
+                        aria-label="More {{ st.noun }}"
+                        style="
+                          flex: none;
+                          width: 44px;
+                          height: 44px;
+                          border-radius: 10px;
+                          border: 1px solid #8fa096;
+                          background: #ffffff;
+                          font-size: 22px;
+                          line-height: 1;
+                          cursor: pointer;
+                        "
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span style="font-size: 13px; color: #4f6158">{{ st.hint }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Medicare -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Medicare</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Medicare levy exemption and cover
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  Most people leave the exemption days at 0. Enter days only if you were eligible
+                  for an exemption, for example because you weren't entitled to Medicare benefits.
+                </p>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 20px 20px">
+                <sc-for
+                  list="{{ dayFields }}"
+                  as="fld"
+                  hint-placeholder-count="2"
+                >
+                  <div
+                    style="
+                      flex: 1 1 240px;
+                      min-width: 0;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 6px;
+                    "
+                  >
+                    <label
+                      for="{{ fld.id }}"
+                      style="font-weight: 600; font-size: 15px"
+                      >{{ fld.label }}</label
+                    >
+                    <div
+                      class="fld"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        border: 1px solid #8fa096;
+                        border-radius: 10px;
+                        background: #ffffff;
+                        padding: 0 14px;
+                      "
+                    >
+                      <input
+                        id="{{ fld.id }}"
+                        type="text"
+                        value="{{ fld.value }}"
+                        placeholder="0"
+                        onChange="{{ fld.change }}"
+                        style="
+                          flex: 1 1 auto;
+                          min-width: 0;
+                          border: 0;
+                          background: transparent;
+                          padding: 13px 0;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 16px;
+                          color: #11231c;
+                        "
+                      />
+                      <span
+                        aria-hidden="true"
+                        style="color: #4f6158; font-size: 14px"
+                        >days</span
+                      >
+                    </div>
+                    <span style="font-size: 13px; color: #4f6158">{{ fld.hint }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if
+                value="{{ exemptionError }}"
+                hint-placeholder-val="{{ false }}"
+              >
+                <p
+                  role="alert"
+                  style="
+                    margin: 0;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #9a2a12;
+                    background: #fce9e3;
+                    border-radius: 8px;
+                    padding: 10px 14px;
+                  "
+                >
+                  Full and half exemption days can't add up to more than 365. Check the numbers
+                  above.
+                </p>
+              </sc-if>
+
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <span style="font-weight: 600; font-size: 15px"
+                  >Private patient hospital cover in 2025–26</span
+                >
+                <div
+                  role="group"
+                  aria-label="Private hospital cover"
+                  style="display: flex; flex-wrap: wrap; gap: 12px"
+                >
+                  <sc-for
+                    list="{{ coverOpts }}"
+                    as="opt"
+                    hint-placeholder-count="3"
+                  >
+                    <button
+                      type="button"
+                      onClick="{{ opt.pick }}"
+                      aria-pressed="{{ opt.pressed }}"
+                      style="{{ opt.style }}"
+                    >
+                      <span style="font-weight: 600; font-size: 16px">{{ opt.label }}</span>
+                      <sc-if
+                        value="{{ opt.hasDesc }}"
+                        hint-placeholder-val="{{ false }}"
+                        ><span style="font-size: 14px; color: #4f6158">{{ opt.desc }}</span></sc-if
+                      >
+                    </button>
+                  </sc-for>
+                </div>
+                <span style="font-size: 13px; color: #4f6158"
+                  >Cover affects the Medicare levy surcharge for people on higher incomes.</span
+                >
+              </div>
+
+              <sc-if
+                value="{{ showCoverDays }}"
+                hint-placeholder-val="{{ false }}"
+              >
+                <div style="max-width: 320px; display: flex; flex-direction: column; gap: 6px">
+                  <label
+                    for="cover-days"
+                    style="font-weight: 600; font-size: 15px"
+                    >Days you had hospital cover</label
+                  >
+                  <div
+                    class="fld"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      border: 1px solid #8fa096;
+                      border-radius: 10px;
+                      background: #ffffff;
+                      padding: 0 14px;
+                    "
+                  >
+                    <input
+                      id="cover-days"
+                      type="text"
+                      value="{{ coverDays }}"
+                      placeholder="0"
+                      onChange="{{ onCoverDays }}"
+                      style="
+                        flex: 1 1 auto;
+                        min-width: 0;
+                        border: 0;
+                        background: transparent;
+                        padding: 13px 0;
+                        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                        font-weight: 500;
+                        font-size: 16px;
+                        color: #11231c;
+                      "
+                    />
+                    <span
+                      aria-hidden="true"
+                      style="color: #4f6158; font-size: 14px"
+                      >days</span
+                    >
+                  </div>
+                  <span style="font-size: 13px; color: #4f6158">Up to 365 days.</span>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- Study loan -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Loans</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Do you have a study or training loan?
+                </h2>
+                <p style="margin: 0; font-size: 15px; color: #4f6158">
+                  For example a HELP debt. Repayments are worked out from your income when you
+                  lodge.
+                </p>
+              </div>
+              <div
+                role="group"
+                aria-label="Study or training loan"
+                style="display: flex; flex-wrap: wrap; gap: 12px; max-width: 440px"
+              >
+                <sc-for
+                  list="{{ loanOpts }}"
+                  as="opt"
+                  hint-placeholder-count="2"
+                >
+                  <button
+                    type="button"
+                    onClick="{{ opt.pick }}"
+                    aria-pressed="{{ opt.pressed }}"
+                    style="{{ opt.style }}"
+                  >
+                    <span style="font-weight: 600; font-size: 16px">{{ opt.label }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding-top: 8px;
+              "
+            >
+              <a
+                class="navlink"
+                href="index.html"
+                style="color: #185034; font-weight: 600; font-size: 15px; text-decoration: none"
+                >← Back to home</a
+              >
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+                <sc-if
+                  value="{{ isReady }}"
+                  hint-placeholder-val="{{ true }}"
+                >
+                  <a
+                    href="expenses.html"
+                    style="
+                      box-sizing: border-box;
+                      text-decoration: none;
+                      text-align: center;
+                      background: #185034;
+                      color: #ffffff;
+                      border-radius: 12px;
+                      padding: 16px 28px;
+                      font-weight: 600;
+                      font-size: 17px;
+                    "
+                    >Continue to expenses</a
+                  >
+                </sc-if>
+                <sc-if
+                  value="{{ notReady }}"
+                  hint-placeholder-val="{{ false }}"
+                >
+                  <button
+                    type="button"
+                    disabled="{{ notReady }}"
+                    style="
+                      border: 0;
+                      border-radius: 12px;
+                      padding: 16px 28px;
+                      font-family: inherit;
+                      font-weight: 600;
+                      font-size: 17px;
+                      background: #dde5df;
+                      color: #6b7b72;
+                    "
+                  >
+                    Continue to expenses
+                  </button>
+                  <span style="font-size: 13px; color: #4f6158"
+                    >Complete the required answers to continue.</span
+                  >
+                </sc-if>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <aside
+            aria-label="Your tax profile so far"
+            style="
+              flex: 1 1 320px;
+              min-width: 0;
+              max-width: 420px;
+              box-sizing: border-box;
+              background: #10392c;
+              color: #eaf1ec;
+              border-radius: 18px;
+              padding: 28px;
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+            "
+          >
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 12px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #b9cbc1;
+                "
+                >Estimated total income</span
+              >
+              <span
+                style="
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: 44px;
+                  line-height: 1;
+                  letter-spacing: -0.02em;
+                "
+                >{{ totalIncome }}</span
+              >
+              <span style="font-size: 14px; color: #b9cbc1"
+                >Tax already withheld: {{ withheldText }}</span
+              >
+            </div>
+
+            <div>
+              <sc-for
+                list="{{ summary }}"
+                as="row"
+                hint-placeholder-count="7"
+              >
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    gap: 2px 16px;
+                    padding: 10px 0;
+                    border-top: 1px solid rgba(234, 241, 236, 0.2);
+                    font-size: 15px;
+                  "
+                >
+                  <span style="color: #b9cbc1">{{ row.label }}</span>
+                  <sc-if
+                    value="{{ row.answered }}"
+                    hint-placeholder-val="{{ true }}"
+                    ><span style="font-weight: 600; text-align: right">{{ row.value }}</span></sc-if
+                  >
+                  <sc-if
+                    value="{{ row.unanswered }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span style="color: #a9bdb2">Not answered</span></sc-if
+                  >
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  font-size: 14px;
+                  color: #b9cbc1;
+                "
+              >
+                <span>Required answers</span
+                ><span
+                  style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-weight: 500"
+                  >{{ reqText }}</span
+                >
+              </div>
+              <div style="height: 6px; border-radius: 3px; background: rgba(234, 241, 236, 0.2)">
+                <div style="{{ barStyle }}"></div>
+              </div>
+            </div>
+
+            <sc-if
+              value="{{ isReady }}"
+              hint-placeholder-val="{{ true }}"
+            >
+              <a
+                href="expenses.html"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  width: 100%;
+                  text-align: center;
+                  text-decoration: none;
+                  background: #f3f5f1;
+                  color: #11231c;
+                  border-radius: 12px;
+                  padding: 16px 24px;
+                  font-weight: 600;
+                  font-size: 17px;
+                "
+                >Continue to expenses</a
+              >
+            </sc-if>
+            <sc-if
+              value="{{ notReady }}"
+              hint-placeholder-val="{{ false }}"
+            >
+              <button
+                type="button"
+                disabled="{{ notReady }}"
+                style="{{ continueStyle }}"
+              >
+                Continue to expenses
+              </button>
+            </sc-if>
+          </aside>
+        </section>
+      </div>
+    </x-dc>
+
+    <script src="js/morphdom.min.js"></script>
+    <script src="js/dc-lite.js"></script>
+    <script src="js/profile.js"></script>
+  </body>
+</html>

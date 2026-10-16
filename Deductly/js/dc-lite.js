@@ -41,7 +41,9 @@
     });
   }
 
-  function textOf(v) { return v == null ? '' : String(v); }
+  function textOf(v) {
+    return v == null ? '' : String(v);
+  }
 
   // ---- base class for page logic ------------------------------------------------
   function DCLogic() {
@@ -73,7 +75,9 @@
 
     // Move <helmet> contents into <head>
     Array.prototype.slice.call(host.querySelectorAll('helmet')).forEach(function (h) {
-      Array.prototype.slice.call(h.children).forEach(function (el) { document.head.appendChild(el); });
+      Array.prototype.slice.call(h.children).forEach(function (el) {
+        document.head.appendChild(el);
+      });
       h.parentNode.removeChild(h);
     });
 
@@ -83,7 +87,9 @@
 
     var self = this;
     ['click', 'input', 'change'].forEach(function (type) {
-      host.addEventListener(type, function (e) { self.dispatch(type, e); });
+      host.addEventListener(type, function (e) {
+        self.dispatch(type, e);
+      });
     });
 
     this.render();
@@ -109,7 +115,10 @@
   };
 
   Runtime.prototype.update = function () {
-    if (this.rendering) { this.dirty = true; return; }
+    if (this.rendering) {
+      this.dirty = true;
+      return;
+    }
     this.render();
   };
 
@@ -140,7 +149,9 @@
   // Look a name up first in loop variables, then in renderVals()
   function scoped(scope, vals) {
     var merged = Object.create(vals);
-    Object.keys(scope).forEach(function (k) { if (k !== '$vals') merged[k] = scope[k]; });
+    Object.keys(scope).forEach(function (k) {
+      if (k !== '$vals') merged[k] = scope[k];
+    });
     return merged;
   }
 
@@ -173,9 +184,10 @@
       return;
     }
 
-    var el = node.namespaceURI && node.namespaceURI !== 'http://www.w3.org/1999/xhtml'
-      ? document.createElementNS(node.namespaceURI, node.localName)
-      : document.createElement(node.localName);
+    var el =
+      node.namespaceURI && node.namespaceURI !== 'http://www.w3.org/1999/xhtml'
+        ? document.createElementNS(node.namespaceURI, node.localName)
+        : document.createElement(node.localName);
 
     var isTextarea = tag === 'textarea';
     var textareaValue = null;
@@ -193,7 +205,11 @@
           var evt = n.slice(2);
           if (evt === 'change') {
             var type = (node.getAttribute('type') || 'text').toLowerCase();
-            evt = (tag === 'textarea' || (tag === 'input' && /^(text|search|tel|url|email|password|number)$/.test(type))) ? 'input' : 'change';
+            evt =
+              tag === 'textarea' ||
+              (tag === 'input' && /^(text|search|tel|url|email|password|number)$/.test(type))
+                ? 'input'
+                : 'change';
           }
           el.setAttribute('data-ev-' + evt, String(this.handlers.push(fn) - 1));
         }
@@ -210,7 +226,10 @@
       else if (value === false) value = 'false';
       else if (value == null) value = '';
 
-      if (isTextarea && n === 'value') { textareaValue = String(value); continue; }
+      if (isTextarea && n === 'value') {
+        textareaValue = String(value);
+        continue;
+      }
       el.setAttribute(n, String(value));
     }
 
@@ -244,6 +263,6 @@
       var logic = new Component();
       new Runtime(logic, host).start();
       return logic;
-    }
+    },
   };
 })();

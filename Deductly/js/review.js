@@ -69,7 +69,7 @@ class Component extends DCLogic {
   // Builds everything the markup in review.html displays. Runs again on every change.
   renderVals() {
     // Turns a saved string into a number. Digits and one decimal point only; anything else is 0.
-    const num = (v) => parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10) || 0;
+    const num = (v) => parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')) || 0;
 
     // Formats dollars, showing cents only when there are some.
     const money = (n) => {

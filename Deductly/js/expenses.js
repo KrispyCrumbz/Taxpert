@@ -107,7 +107,7 @@ class Component extends DCLogic {
       date: '',
       pct: '100',
       paid: true,
-      record: false,
+      record: true,
     };
 
     // Sample expenses shown the first time, so a new visitor sees a filled-in page.

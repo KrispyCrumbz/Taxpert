@@ -102,10 +102,19 @@ class Component extends DCLogic {
     }
 
     // Turns an input string into a number. Digits and one decimal point only; anything else is 0.
-    const num = (v) => parseInt(String(v == null ? '' : v).replace(/[^0-9]/g, ''), 10) || 0;
+    const num = (v) => parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')) || 0;
 
     // Formats dollars, showing cents only when there are some: $92,000 or $92,000.50.
-    const fmt = (n) => '$' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const fmt = (n) => {
+      const r = Math.round(n * 100) / 100;
+      const whole = Math.floor(r);
+      const cents = Math.round((r - whole) * 100);
+      return (
+        '$' +
+        String(whole).replace(/\B(?=(\d{3})+(?!\d))/g, ',') +
+        (cents ? '.' + (cents < 10 ? '0' : '') + cents : '')
+      );
+    };
 
     // Saves the new answers and re-renders.
     const commit = (next) => {
@@ -118,6 +127,19 @@ class Component extends DCLogic {
 
     // Input handler for whole numbers (day counts): keeps digits only.
     const digits = (key) => (e) => put({ [key]: String(e.target.value).replace(/[^0-9]/g, '') });
+    // Dollar amounts: digits plus one decimal point, up to cents
+    const dollars = (key) => (e) => {
+      let v = String(e.target.value).replace(/[^0-9.]/g, '');
+      const i = v.indexOf('.');
+      if (i >= 0)
+        v =
+          v.slice(0, i + 1) +
+          v
+            .slice(i + 1)
+            .replace(/\./g, '')
+            .slice(0, 2);
+      put({ [key]: v });
+    };
 
     // Style for a selectable answer card, highlighted when chosen.
     const optStyle = (sel) =>
@@ -178,14 +200,14 @@ class Component extends DCLogic {
         label: 'Salary and wages',
         hint: 'Gross amount, before tax.',
         value: f.salary,
-        change: digits('salary'),
+        change: dollars('salary'),
       },
       {
         id: 'inc-withheld',
         label: 'Tax withheld',
         hint: 'Listed as tax withheld on your income statement.',
         value: f.withheld,
-        change: digits('withheld'),
+        change: dollars('withheld'),
       },
     ];
     if (showBusiness) {
@@ -194,7 +216,7 @@ class Component extends DCLogic {
         label: 'Business income',
         hint: 'Before business expenses.',
         value: f.business,
-        change: digits('business'),
+        change: dollars('business'),
       });
     }
     incomeFields.push(
@@ -203,21 +225,21 @@ class Component extends DCLogic {
         label: 'Bank interest',
         hint: 'Interest from all accounts.',
         value: f.interest,
-        change: digits('interest'),
+        change: dollars('interest'),
       },
       {
         id: 'inc-dividends',
         label: 'Dividends',
         hint: 'Including franked amounts.',
         value: f.dividends,
-        change: digits('dividends'),
+        change: dollars('dividends'),
       },
       {
         id: 'inc-other',
         label: 'Other income',
         hint: 'Such as rent or government payments.',
         value: f.other,
-        change: digits('other'),
+        change: dollars('other'),
       },
     );
 
@@ -349,7 +371,7 @@ class Component extends DCLogic {
       steppers: steppers,
       showSpouse: showSpouse,
       spouseIncome: f.spouseIncome,
-      onSpouseIncome: digits('spouseIncome'),
+      onSpouseIncome: dollars('spouseIncome'),
       showCoverDays: showCoverDays,
       coverDays: f.coverDays,
       onCoverDays: (e) => {

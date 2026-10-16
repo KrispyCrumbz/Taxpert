@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <!--
+Deductly: home page.
+Introduces the app, shows a live planner preview (switch sample expenses on and off to see the
+total change), explains the three tests, how it works, and the deduction categories.
+Logic for the interactive preview lives in js/index.js.
+-->
+    <meta charset="utf-8" />
+    <title>Deductly: Australian tax return helper</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/logo-icon.svg"
+    />
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+        />
+        <style>
+          body {
+            margin: 0;
+            background: #f3f5f1;
+            -webkit-font-smoothing: antialiased;
+          }
+          button {
+            font: inherit;
+            color: inherit;
+          }
+          :focus-visible {
+            outline: 3px solid #2f6feb;
+            outline-offset: 3px;
+          }
+          a.navlink:hover {
+            text-decoration: underline;
+          }
+          .logo-lg {
+            display: block;
+          }
+          .logo-sm {
+            display: none;
+          }
+          @media (max-width: 480px) {
+            .logo-lg {
+              display: none;
+            }
+            .logo-sm {
+              display: block;
+            }
+          }
+          a.cta:hover {
+            filter: brightness(1.12);
+          }
+        </style>
+      </helmet>
+
+      <div
+        id="top"
+        style="
+          background: #f3f5f1;
+          color: #11231c;
+          font-family: 'Hanken Grotesk', system-ui, sans-serif;
+          font-size: 17px;
+          line-height: 1.55;
+        "
+      >
+        <!-- Nav -->
+        <header
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+          "
+        >
+          <a
+            href="#top"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              text-decoration: none;
+              color: #11231c;
+            "
+          >
+            <img
+              class="logo-lg"
+              src="assets/logo-primary.svg"
+              alt="Deductly"
+              style="height: 40px; width: auto"
+            />
+            <img
+              class="logo-sm"
+              src="assets/logo-icon.svg"
+              alt="Deductly"
+              style="height: 36px; width: auto"
+            />
+          </a>
+
+          <!-- Nav: Main -->
+          <nav
+            aria-label="Main"
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 8px 28px;
+              font-size: 15px;
+              font-weight: 500;
+            "
+          >
+            <a
+              class="navlink"
+              href="#how"
+              style="color: #11231c; text-decoration: none"
+              >How it works</a
+            >
+            <a
+              class="navlink"
+              href="#deductions"
+              style="color: #11231c; text-decoration: none"
+              >Deductions</a
+            >
+            <a
+              class="cta"
+              href="profile.html"
+              style="
+                background: #11231c;
+                color: #ffffff;
+                text-decoration: none;
+                padding: 11px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+              "
+              >Start planning</a
+            >
+          </nav>
+        </header>
+
+        <!-- Hero -->
+        <section
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 88px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 56px 48px;
+          "
+        >
+          <div
+            style="
+              flex: 1 1 480px;
+              min-width: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 24px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                font-weight: 500;
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #185034;
+              "
+            >
+              2025–26 income year · Self-lodgers file by 31 October 2026
+            </p>
+            <h1
+              style="
+                margin: 0;
+                font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                font-weight: 700;
+                font-size: clamp(40px, 6vw, 72px);
+                line-height: 1.02;
+                letter-spacing: -0.03em;
+                text-wrap: balance;
+              "
+            >
+              Know your deductions
+              <span
+                style="
+                  background: linear-gradient(transparent 62%, #f2c230 62%);
+                  padding: 0 4px;
+                  margin: 0 -4px;
+                "
+                >before you lodge.</span
+              >
+            </h1>
+            <p style="margin: 0; max-width: 540px; font-size: 19px; color: #2c4036">
+              Deductly helps Australian employees and sole traders list their work-related expenses,
+              check each one against the ATO's basic rules and see what is ready to claim.
+            </p>
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 12px 20px;
+                padding-top: 4px;
+              "
+            >
+              <a
+                class="cta"
+                href="profile.html"
+                style="
+                  background: #185034;
+                  color: #ffffff;
+                  text-decoration: none;
+                  padding: 16px 28px;
+                  border-radius: 12px;
+                  font-weight: 600;
+                  font-size: 17px;
+                  min-height: 20px;
+                "
+                >Start my deduction plan</a
+              >
+              <a
+                class="navlink"
+                href="#how"
+                style="color: #11231c; font-weight: 600; text-decoration: none; padding: 12px 4px"
+                >See how it works</a
+              >
+            </div>
+            <p style="margin: 0; max-width: 500px; font-size: 15px; color: #4f6158">
+              Deductly doesn't lodge your return. It gets your claims organised before you use myTax
+              or a tax agent.
+            </p>
+          </div>
+
+          <!-- Planner preview -->
+          <div
+            style="
+              flex: 1 1 400px;
+              min-width: 0;
+              max-width: 540px;
+              box-sizing: border-box;
+              background: #ffffff;
+              border: 1px solid #d3dbd5;
+              border-radius: 18px;
+              padding: 24px;
+              box-shadow: 0 18px 40px -24px rgba(17, 35, 28, 0.35);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 8px 16px;
+                padding-bottom: 16px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span
+                  style="
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                  >Deduction plan</span
+                >
+                <span style="font-size: 14px; color: #4f6158">2025–26 income year</span>
+              </div>
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 11px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #4f6158;
+                  border: 1px solid #d3dbd5;
+                  border-radius: 6px;
+                  padding: 4px 8px;
+                "
+                >Example figures</span
+              >
+            </div>
+
+            <sc-for
+              list="{{ rows }}"
+              as="row"
+              hint-placeholder-count="5"
+            >
+              <button
+                type="button"
+                onClick="{{ row.toggle }}"
+                aria-pressed="{{ row.pressed }}"
+                style="
+                  width: 100%;
+                  box-sizing: border-box;
+                  display: flex;
+                  align-items: center;
+                  gap: 14px;
+                  padding: 14px 0;
+                  background: none;
+                  border: 0;
+                  border-top: 1px solid #e3e8e4;
+                  text-align: left;
+                  cursor: pointer;
+                "
+              >
+                <sc-if
+                  value="{{ row.on }}"
+                  hint-placeholder-val="{{ true }}"
+                >
+                  <span
+                    aria-hidden="true"
+                    style="
+                      flex: none;
+                      width: 24px;
+                      height: 24px;
+                      box-sizing: border-box;
+                      border-radius: 7px;
+                      background: #185034;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2.5 7.5l3 3 6-7"
+                        stroke="#FFFFFF"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      /></svg
+                  ></span>
+                </sc-if>
+                <sc-if
+                  value="{{ row.off }}"
+                  hint-placeholder-val="{{ false }}"
+                >
+                  <span
+                    aria-hidden="true"
+                    style="
+                      flex: none;
+                      width: 24px;
+                      height: 24px;
+                      box-sizing: border-box;
+                      border-radius: 7px;
+                      border: 2px solid #b7c3bb;
+                      background: #ffffff;
+                    "
+                  ></span>
+                </sc-if>
+                <span
+                  style="
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                  "
+                >
+                  <span style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px">
+                    <span
+                      style="
+                        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                        font-weight: 500;
+                        font-size: 12px;
+                        color: #185034;
+                      "
+                      >{{ row.code }}</span
+                    >
+                    <span style="font-weight: 600; font-size: 16px">{{ row.name }}</span>
+                  </span>
+                  <span style="font-size: 14px; color: #4f6158">{{ row.note }}</span>
+                  <span style="display: flex">
+                    <sc-if
+                      value="{{ row.isReady }}"
+                      hint-placeholder-val="{{ true }}"
+                    >
+                      <span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #0e5a3f;
+                          background: #ddefe5;
+                          border-radius: 999px;
+                          padding: 2px 10px;
+                        "
+                        >Ready</span
+                      >
+                    </sc-if>
+                    <sc-if
+                      value="{{ row.isReceipt }}"
+                      hint-placeholder-val="{{ false }}"
+                    >
+                      <span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #7a4300;
+                          background: #fbe9c6;
+                          border-radius: 999px;
+                          padding: 2px 10px;
+                        "
+                        >Needs a receipt</span
+                      >
+                    </sc-if>
+                    <sc-if
+                      value="{{ row.isCheck }}"
+                      hint-placeholder-val="{{ false }}"
+                    >
+                      <span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #2f3f80;
+                          background: #e3e8f5;
+                          border-radius: 999px;
+                          padding: 2px 10px;
+                        "
+                        >Check the year</span
+                      >
+                    </sc-if>
+                  </span>
+                </span>
+                <sc-if
+                  value="{{ row.on }}"
+                  hint-placeholder-val="{{ true }}"
+                >
+                  <span
+                    style="
+                      flex: none;
+                      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                      font-weight: 500;
+                      font-size: 16px;
+                    "
+                    >{{ row.amount }}</span
+                  >
+                </sc-if>
+                <sc-if
+                  value="{{ row.off }}"
+                  hint-placeholder-val="{{ false }}"
+                >
+                  <span
+                    style="
+                      flex: none;
+                      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                      font-weight: 500;
+                      font-size: 16px;
+                      color: #7c8c83;
+                      text-decoration: line-through;
+                    "
+                    >{{ row.amount }}</span
+                  >
+                </sc-if>
+              </button>
+            </sc-for>
+
+            <div
+              style="
+                border-top: 2px solid #11231c;
+                padding-top: 16px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                justify-content: space-between;
+                gap: 8px 16px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #4f6158;
+                  "
+                  >Planned deductions</span
+                >
+                <span style="font-size: 14px; color: #4f6158">{{ countText }}</span>
+              </div>
+              <span
+                style="
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: 40px;
+                  line-height: 1;
+                  letter-spacing: -0.02em;
+                "
+                >{{ total }}</span
+              >
+            </div>
+            <p style="margin: 14px 0 0; font-size: 13px; color: #4f6158">
+              Select a row to include it in the plan or leave it out.
+            </p>
+          </div>
+        </section>
+
+        <!-- Three tests -->
+        <section style="background: #10392c; color: #eaf1ec">
+          <div
+            style="
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 88px 24px;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              gap: 48px;
+            "
+          >
+            <div style="max-width: 640px; display: flex; flex-direction: column; gap: 16px">
+              <p
+                style="
+                  margin: 0;
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 12px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #f2c230;
+                "
+              >
+                The ATO's basic rules
+              </p>
+              <h2
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: clamp(30px, 3.6vw, 44px);
+                  line-height: 1.08;
+                  letter-spacing: -0.02em;
+                  text-wrap: balance;
+                "
+              >
+                Every deduction has to pass three tests
+              </h2>
+              <p style="margin: 0; color: #b9cbc1">
+                Deductly asks all three for each expense you add, so your plan is ready if the ATO
+                ever asks about it.
+              </p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 40px 32px">
+              <div
+                style="
+                  flex: 1 1 260px;
+                  min-width: 0;
+                  border-top: 1px solid rgba(234, 241, 236, 0.35);
+                  padding-top: 20px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 24px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  You paid for it
+                </h3>
+                <p style="margin: 0; color: #b9cbc1">
+                  You spent the money yourself and your employer didn't pay you back.
+                </p>
+              </div>
+              <div
+                style="
+                  flex: 1 1 260px;
+                  min-width: 0;
+                  border-top: 1px solid rgba(234, 241, 236, 0.35);
+                  padding-top: 20px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 24px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  It earned your income
+                </h3>
+                <p style="margin: 0; color: #b9cbc1">
+                  The expense relates directly to earning your income. If it's part private, you
+                  claim only the work portion.
+                </p>
+              </div>
+              <div
+                style="
+                  flex: 1 1 260px;
+                  min-width: 0;
+                  border-top: 1px solid rgba(234, 241, 236, 0.35);
+                  padding-top: 20px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 24px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  You can prove it
+                </h3>
+                <p style="margin: 0; color: #b9cbc1">
+                  You have a record, such as a receipt, an invoice or a logbook.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- How it works -->
+        <section
+          id="how"
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 96px 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 48px;
+          "
+        >
+          <div style="max-width: 640px; display: flex; flex-direction: column; gap: 16px">
+            <p
+              style="
+                margin: 0;
+                font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                font-weight: 500;
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #185034;
+              "
+            >
+              How it works
+            </p>
+            <h2
+              style="
+                margin: 0;
+                font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                font-weight: 700;
+                font-size: clamp(30px, 3.6vw, 44px);
+                line-height: 1.08;
+                letter-spacing: -0.02em;
+                text-wrap: balance;
+              "
+            >
+              Four steps to a plan you can lodge from
+            </h2>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 40px 32px">
+            <div
+              style="
+                flex: 1 1 240px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 14px;
+                  color: #185034;
+                "
+                >01</span
+              >
+              <h3
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 22px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Tell us your situation
+              </h3>
+              <p style="margin: 0; color: #4f6158">
+                Employee, sole trader or both. Deductly shows the categories that fit.
+              </p>
+            </div>
+            <div
+              style="
+                flex: 1 1 240px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 14px;
+                  color: #185034;
+                "
+                >02</span
+              >
+              <h3
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 22px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Add expenses and records
+              </h3>
+              <p style="margin: 0; color: #4f6158">
+                Enter amounts, attach receipts and log your hours as you go.
+              </p>
+            </div>
+            <div
+              style="
+                flex: 1 1 240px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 14px;
+                  color: #185034;
+                "
+                >03</span
+              >
+              <h3
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 22px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Review the plan
+              </h3>
+              <p style="margin: 0; color: #4f6158">
+                See every claim by ATO category, with a flag on anything missing a record.
+              </p>
+            </div>
+            <div
+              style="
+                flex: 1 1 240px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 14px;
+                  color: #185034;
+                "
+                >04</span
+              >
+              <h3
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 600;
+                  font-size: 22px;
+                  letter-spacing: -0.01em;
+                "
+              >
+                Take it to lodgement
+              </h3>
+              <p style="margin: 0; color: #4f6158">
+                Copy the totals into myTax or hand the summary to your tax agent.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Categories -->
+        <section
+          id="deductions"
+          style="
+            background: #ffffff;
+            border-top: 1px solid #d3dbd5;
+            border-bottom: 1px solid #d3dbd5;
+          "
+        >
+          <div
+            style="
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 96px 24px;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              gap: 48px;
+            "
+          >
+            <div style="max-width: 640px; display: flex; flex-direction: column; gap: 16px">
+              <p
+                style="
+                  margin: 0;
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 12px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #185034;
+                "
+              >
+                Deduction categories
+              </p>
+              <h2
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: clamp(30px, 3.6vw, 44px);
+                  line-height: 1.08;
+                  letter-spacing: -0.02em;
+                  text-wrap: balance;
+                "
+              >
+                Sorted under the same labels you'll see in myTax
+              </h2>
+              <p style="margin: 0; color: #4f6158">
+                Each category comes with a plain-language guide and a reminder of what to keep.
+              </p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 40px 32px">
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D1 · D2</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Car and work travel
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Trips between work sites and travel that is part of the job.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep a logbook or a record of your work trips.
+                </p>
+              </div>
+
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D3</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Clothing and laundry
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Uniforms and protective gear, plus cleaning them. Everyday clothes don't count.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep receipts and a note of how often you wash.
+                </p>
+              </div>
+
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D4</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Self-education
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Courses and study that relate to the job you have now.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep invoices and the course details.
+                </p>
+              </div>
+
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D5</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Other work-related
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Working from home, tools, phone and internet use, and union fees.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep an hours log and your receipts.
+                </p>
+              </div>
+
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D8</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Gifts and donations
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Gifts of $2 or more to deductible gift recipients.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep the receipt from each charity.
+                </p>
+              </div>
+
+              <div
+                style="
+                  flex: 1 1 300px;
+                  min-width: 0;
+                  border-top: 2px solid #11231c;
+                  padding-top: 16px;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 8px;
+                "
+              >
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 13px;
+                    color: #185034;
+                  "
+                  >D9</span
+                >
+                <h3
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 600;
+                    font-size: 22px;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Managing tax affairs
+                </h3>
+                <p style="margin: 0; color: #2c4036">
+                  Tax agent fees and other costs of dealing with the ATO.
+                </p>
+                <p style="margin: 0; font-size: 14px; color: #4f6158">
+                  Keep the invoice and note the date you paid it.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Call to action -->
+        <section
+          id="start"
+          style="background: #10392c; color: #eaf1ec"
+        >
+          <div
+            style="
+              max-width: 1200px;
+              margin: 0 auto;
+              padding: 88px 24px;
+              box-sizing: border-box;
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              justify-content: space-between;
+              gap: 32px;
+            "
+          >
+            <div
+              style="
+                flex: 1 1 440px;
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <h2
+                style="
+                  margin: 0;
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: clamp(30px, 3.6vw, 44px);
+                  line-height: 1.08;
+                  letter-spacing: -0.02em;
+                  text-wrap: balance;
+                "
+              >
+                Start your 2025–26 deduction plan
+              </h2>
+              <p style="margin: 0; max-width: 560px; color: #b9cbc1">
+                Self-lodgers have until 31 October 2026. A registered tax agent may be able to give
+                you more time.
+              </p>
+            </div>
+            <a
+              class="cta"
+              href="profile.html"
+              style="
+                flex: none;
+                background: #f3f5f1;
+                color: #11231c;
+                text-decoration: none;
+                padding: 16px 28px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 17px;
+              "
+              >Start my deduction plan</a
+            >
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 56px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px 40px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px">
+            <img
+              src="assets/logo-icon.svg"
+              alt="Deductly"
+              style="height: 34px; width: auto; display: block"
+            />
+            <span style="font-weight: 600; font-size: 15px; color: #4f6158"
+              >Smart Expenses. Simple Refunds.</span
+            >
+          </div>
+          <p style="margin: 0; flex: 1 1 360px; max-width: 640px; font-size: 14px; color: #4f6158">
+            General information only. Deductly is a planning tool, not a registered tax agent, and
+            it doesn't give tax advice. Check
+            <a
+              href="https://www.ato.gov.au"
+              style="color: #185034; font-weight: 600"
+              >ato.gov.au</a
+            >
+            for the rules that apply to your situation.
+          </p>
+        </footer>
+      </div>
+    </x-dc>
+
+    <script src="js/morphdom.min.js"></script>
+    <script src="js/dc-lite.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

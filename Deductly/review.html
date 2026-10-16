@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <!--
+Deductly: step 3 of 3, review.
+Shows what is ready to claim, a checklist, the amounts to enter at each label, an estimated tax
+saving and refund, and lodgement dates. Reads the saved profile and expenses; can export a CSV.
+Logic and tax calculations: js/review.js.
+-->
+    <meta charset="utf-8" />
+    <title>Review your plan · Deductly</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="assets/logo-icon.svg"
+    />
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap"
+        />
+        <style>
+          body {
+            margin: 0;
+            background: #f3f5f1;
+            -webkit-font-smoothing: antialiased;
+          }
+          button {
+            font: inherit;
+            color: inherit;
+          }
+          :focus-visible {
+            outline: 3px solid #2f6feb;
+            outline-offset: 3px;
+          }
+          a.navlink:hover {
+            text-decoration: underline;
+          }
+          a.cta:hover {
+            filter: brightness(1.12);
+          }
+          .logo-lg {
+            display: block;
+          }
+          .logo-sm {
+            display: none;
+          }
+          @media (max-width: 480px) {
+            .logo-lg {
+              display: none;
+            }
+            .logo-sm {
+              display: block;
+            }
+          }
+        </style>
+      </helmet>
+
+      <div
+        id="top"
+        style="
+          background: #f3f5f1;
+          color: #11231c;
+          font-family: 'Hanken Grotesk', system-ui, sans-serif;
+          font-size: 17px;
+          line-height: 1.55;
+        "
+      >
+        <!-- Header -->
+        <header
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+          "
+        >
+          <a
+            href="index.html"
+            aria-label="Deductly home"
+            style="display: flex; align-items: center; text-decoration: none; color: #11231c"
+          >
+            <img
+              class="logo-lg"
+              src="assets/logo-primary.svg"
+              alt="Deductly"
+              style="height: 40px; width: auto"
+            />
+            <img
+              class="logo-sm"
+              src="assets/logo-icon.svg"
+              alt="Deductly"
+              style="height: 36px; width: auto"
+            />
+          </a>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span
+              style="display: flex; gap: 6px"
+              aria-hidden="true"
+            >
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #185034"
+              ></span>
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #185034"
+              ></span>
+              <span
+                style="width: 32px; height: 5px; border-radius: 3px; background: #185034"
+              ></span>
+            </span>
+            <span
+              style="
+                font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                font-weight: 500;
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #4f6158;
+              "
+              >Step 3 of 3</span
+            >
+          </div>
+        </header>
+
+        <!-- Title -->
+        <section
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          "
+        >
+          <a
+            class="navlink"
+            href="expenses.html"
+            style="color: #185034; font-weight: 600; font-size: 15px; text-decoration: none"
+            >← Back to expenses</a
+          >
+          <p
+            style="
+              margin: 0;
+              font-family: 'IBM Plex Mono', ui-monospace, monospace;
+              font-weight: 500;
+              font-size: 12px;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+              color: #185034;
+            "
+          >
+            2025–26 income year
+          </p>
+          <h1
+            style="
+              margin: 0;
+              font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+              font-weight: 700;
+              font-size: clamp(36px, 5vw, 56px);
+              line-height: 1.04;
+              letter-spacing: -0.03em;
+              text-wrap: balance;
+            "
+          >
+            Review your plan
+          </h1>
+          <p style="margin: 0; max-width: 640px; font-size: 19px; color: #2c4036">
+            Here is what Deductly has for lodgement. Sort out anything on the checklist, then take
+            the amounts to myTax or your tax agent.
+          </p>
+
+          <sc-if
+            value="{{ usingSample }}"
+            hint-placeholder-val="{{ true }}"
+          >
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px 16px;
+                background: #fbf0c9;
+                border: 1px solid #e6cd7a;
+                border-radius: 12px;
+                padding: 12px 16px;
+                max-width: 100%;
+                box-sizing: border-box;
+              "
+            >
+              <span style="font-size: 15px; color: #4a3a00; flex: 1 1 320px; min-width: 0"
+                >This page is showing sample answers. Fill in your own tax profile and expenses and
+                it updates to match.</span
+              >
+              <span style="display: flex; flex-wrap: wrap; gap: 8px">
+                <a
+                  href="profile.html"
+                  style="
+                    background: #11231c;
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    padding: 9px 16px;
+                    font-weight: 600;
+                    font-size: 14px;
+                  "
+                  >Tax profile</a
+                >
+                <a
+                  href="expenses.html"
+                  style="
+                    background: #11231c;
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    padding: 9px 16px;
+                    font-weight: 600;
+                    font-size: 14px;
+                  "
+                  >Expenses</a
+                >
+              </span>
+            </div>
+          </sc-if>
+        </section>
+
+        <!-- Main + side -->
+        <section
+          style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px 96px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 32px;
+          "
+        >
+          <div
+            style="flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px"
+          >
+            <!-- Estimated result -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Refund estimate</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Your estimated result
+                </h2>
+              </div>
+              <sc-if
+                value="{{ refundOn }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div
+                  style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px 40px"
+                >
+                  <div
+                    style="
+                      flex: 1 1 220px;
+                      min-width: 0;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 8px;
+                    "
+                  >
+                    <span style="font-weight: 600; font-size: 16px">{{ resultLabel }}</span>
+                    <sc-if
+                      value="{{ isRefund }}"
+                      hint-placeholder-val="{{ true }}"
+                      ><span
+                        style="
+                          font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                          font-weight: 700;
+                          font-size: clamp(44px, 6vw, 64px);
+                          line-height: 1;
+                          letter-spacing: -0.03em;
+                          color: #185034;
+                        "
+                        >{{ resultText }}</span
+                      ></sc-if
+                    >
+                    <sc-if
+                      value="{{ notRefund }}"
+                      hint-placeholder-val="{{ false }}"
+                      ><span
+                        style="
+                          font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                          font-weight: 700;
+                          font-size: clamp(44px, 6vw, 64px);
+                          line-height: 1;
+                          letter-spacing: -0.03em;
+                          color: #7a4300;
+                        "
+                        >{{ resultText }}</span
+                      ></sc-if
+                    >
+                    <span style="font-size: 14px; color: #4f6158"
+                      >Tax already withheld, minus the tax and levies you owe on your taxable
+                      income.</span
+                    >
+                  </div>
+                  <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column">
+                    <sc-for
+                      list="{{ refundRows }}"
+                      as="r"
+                      hint-placeholder-count="7"
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          flex-wrap: wrap;
+                          justify-content: space-between;
+                          gap: 2px 16px;
+                          padding: 10px 0;
+                          border-top: 1px solid #e3e8e4;
+                          font-size: 15px;
+                        "
+                      >
+                        <span style="color: #4f6158">{{ r.label }}</span
+                        ><span style="{{ r.style }}">{{ r.amount }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+                <p style="margin: 0; font-size: 13px; color: #4f6158">{{ refundFoot }}</p>
+              </sc-if>
+              <sc-if
+                value="{{ refundOff }}"
+                hint-placeholder-val="{{ false }}"
+              >
+                <p style="margin: 0; font-size: 15px; color: #4f6158">{{ refundOffNote }}</p>
+              </sc-if>
+            </div>
+
+            <!-- Checklist -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <div style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px">
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                    font-weight: 500;
+                    font-size: 12px;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #185034;
+                  "
+                  >Checklist</span
+                >
+                <h2
+                  style="
+                    margin: 0;
+                    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                    font-weight: 700;
+                    font-size: 26px;
+                    letter-spacing: -0.02em;
+                  "
+                >
+                  Before you lodge
+                </h2>
+              </div>
+              <sc-for
+                list="{{ checks }}"
+                as="it"
+                hint-placeholder-count="3"
+              >
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                    gap: 8px 16px;
+                    padding: 16px 0;
+                    border-top: 1px solid #e3e8e4;
+                  "
+                >
+                  <span style="flex: none; min-width: 104px; display: flex">
+                    <sc-if
+                      value="{{ it.isAction }}"
+                      hint-placeholder-val="{{ true }}"
+                      ><span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #7a4300;
+                          background: #fbe9c6;
+                          border-radius: 999px;
+                          padding: 3px 10px;
+                        "
+                        >Action needed</span
+                      ></sc-if
+                    >
+                    <sc-if
+                      value="{{ it.isNote }}"
+                      hint-placeholder-val="{{ false }}"
+                      ><span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #2f3f80;
+                          background: #e3e8f5;
+                          border-radius: 999px;
+                          padding: 3px 10px;
+                        "
+                        >Good to know</span
+                      ></sc-if
+                    >
+                    <sc-if
+                      value="{{ it.isOk }}"
+                      hint-placeholder-val="{{ false }}"
+                      ><span
+                        style="
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #0e5a3f;
+                          background: #ddefe5;
+                          border-radius: 999px;
+                          padding: 3px 10px;
+                        "
+                        >All clear</span
+                      ></sc-if
+                    >
+                  </span>
+                  <div
+                    style="
+                      flex: 1 1 280px;
+                      min-width: 0;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 4px;
+                    "
+                  >
+                    <span style="font-weight: 600; font-size: 16px">{{ it.title }}</span>
+                    <span style="font-size: 15px; color: #4f6158">{{ it.detail }}</span>
+                    <sc-if
+                      value="{{ it.hasLink }}"
+                      hint-placeholder-val="{{ false }}"
+                      ><a
+                        class="navlink"
+                        href="{{ it.href }}"
+                        style="
+                          color: #185034;
+                          font-weight: 600;
+                          font-size: 15px;
+                          text-decoration: none;
+                          padding-top: 4px;
+                        "
+                        >{{ it.link }} →</a
+                      ></sc-if
+                    >
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- Amounts for lodgement -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  align-items: flex-start;
+                  justify-content: space-between;
+                  gap: 12px 20px;
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                    flex: 1 1 300px;
+                    min-width: 0;
+                  "
+                >
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                      font-weight: 500;
+                      font-size: 12px;
+                      letter-spacing: 0.08em;
+                      text-transform: uppercase;
+                      color: #185034;
+                    "
+                    >Deductions</span
+                  >
+                  <h2
+                    style="
+                      margin: 0;
+                      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                      font-weight: 700;
+                      font-size: 26px;
+                      letter-spacing: -0.02em;
+                    "
+                  >
+                    Amounts for lodgement
+                  </h2>
+                  <p style="margin: 0; font-size: 15px; color: #4f6158">
+                    Enter the ready amounts at these labels in myTax, or give the list to your tax
+                    agent.
+                  </p>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+                  <span style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px">
+                    <button
+                      type="button"
+                      onClick="{{ saveCsv }}"
+                      style="
+                        background: #185034;
+                        color: #ffffff;
+                        border: 0;
+                        border-radius: 10px;
+                        padding: 11px 16px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        cursor: pointer;
+                      "
+                    >
+                      Save as spreadsheet
+                    </button>
+                    <button
+                      type="button"
+                      onClick="{{ copy }}"
+                      style="
+                        background: #ffffff;
+                        color: #11231c;
+                        border: 1px solid #8fa096;
+                        border-radius: 10px;
+                        padding: 10px 16px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        cursor: pointer;
+                      "
+                    >
+                      Copy summary
+                    </button>
+                  </span>
+                  <sc-if
+                    value="{{ exportSaved }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #0e5a3f; font-weight: 600"
+                      >Spreadsheet saved</span
+                    ></sc-if
+                  >
+                  <sc-if
+                    value="{{ exportFailed }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #9a2a12; font-weight: 600"
+                      >Couldn't save the file. Try another browser.</span
+                    ></sc-if
+                  >
+                  <sc-if
+                    value="{{ copyOk }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #0e5a3f; font-weight: 600"
+                      >Copied to your clipboard</span
+                    ></sc-if
+                  >
+                  <sc-if
+                    value="{{ copyFail }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><span
+                      role="status"
+                      style="font-size: 13px; color: #9a2a12; font-weight: 600"
+                      >Couldn't copy here. Select the table instead.</span
+                    ></sc-if
+                  >
+                </div>
+              </div>
+
+              <div style="overflow-x: auto">
+                <div style="min-width: 560px; display: flex; flex-direction: column">
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: minmax(0, 2.4fr) 56px minmax(0, 1fr) minmax(0, 1fr);
+                      gap: 12px;
+                      padding: 10px 0;
+                      border-bottom: 2px solid #11231c;
+                      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                      font-weight: 500;
+                      font-size: 11px;
+                      letter-spacing: 0.08em;
+                      text-transform: uppercase;
+                      color: #4f6158;
+                    "
+                  >
+                    <span>Label</span><span style="text-align: right">Items</span
+                    ><span style="text-align: right">Ready to claim</span
+                    ><span style="text-align: right">Needs a record</span>
+                  </div>
+                  <sc-if
+                    value="{{ noRows }}"
+                    hint-placeholder-val="{{ false }}"
+                    ><div style="padding: 24px 0; font-size: 15px; color: #4f6158">
+                      No expenses in your plan yet.
+                    </div></sc-if
+                  >
+                  <sc-for
+                    list="{{ rows }}"
+                    as="r"
+                    hint-placeholder-count="5"
+                  >
+                    <div
+                      style="
+                        display: grid;
+                        grid-template-columns: minmax(0, 2.4fr) 56px minmax(0, 1fr) minmax(0, 1fr);
+                        gap: 12px;
+                        align-items: baseline;
+                        padding: 14px 0;
+                        border-bottom: 1px solid #e3e8e4;
+                      "
+                    >
+                      <span style="min-width: 0"
+                        ><span
+                          style="
+                            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                            font-weight: 500;
+                            font-size: 12px;
+                            color: #185034;
+                          "
+                          >{{ r.code }}</span
+                        >
+                        <span style="font-weight: 600">{{ r.name }}</span></span
+                      >
+                      <span
+                        style="
+                          text-align: right;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 15px;
+                          color: #4f6158;
+                        "
+                        >{{ r.count }}</span
+                      >
+                      <span
+                        style="
+                          text-align: right;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 16px;
+                        "
+                        >{{ r.ready }}</span
+                      >
+                      <span
+                        style="
+                          text-align: right;
+                          font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                          font-weight: 500;
+                          font-size: 16px;
+                          color: #7a4300;
+                        "
+                        >{{ r.pending }}</span
+                      >
+                    </div>
+                  </sc-for>
+                  <div
+                    style="
+                      display: grid;
+                      grid-template-columns: minmax(0, 2.4fr) 56px minmax(0, 1fr) minmax(0, 1fr);
+                      gap: 12px;
+                      align-items: baseline;
+                      padding: 16px 0 4px;
+                    "
+                  >
+                    <span style="font-weight: 600">Total</span>
+                    <span
+                      style="
+                        text-align: right;
+                        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                        font-weight: 500;
+                        font-size: 15px;
+                        color: #4f6158;
+                      "
+                      >{{ totalCount }}</span
+                    >
+                    <span
+                      style="
+                        text-align: right;
+                        font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                        font-weight: 700;
+                        font-size: 22px;
+                      "
+                      >{{ readyTotal }}</span
+                    >
+                    <span
+                      style="
+                        text-align: right;
+                        font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                        font-weight: 700;
+                        font-size: 22px;
+                        color: #7a4300;
+                      "
+                      >{{ pendingTotal }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile -->
+            <div
+              style="
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 16px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  align-items: flex-start;
+                  justify-content: space-between;
+                  gap: 12px 20px;
+                  padding-bottom: 8px;
+                "
+              >
+                <div style="display: flex; flex-direction: column; gap: 6px">
+                  <span
+                    style="
+                      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                      font-weight: 500;
+                      font-size: 12px;
+                      letter-spacing: 0.08em;
+                      text-transform: uppercase;
+                      color: #185034;
+                    "
+                    >Tax profile</span
+                  >
+                  <h2
+                    style="
+                      margin: 0;
+                      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                      font-weight: 700;
+                      font-size: 26px;
+                      letter-spacing: -0.02em;
+                    "
+                  >
+                    Your details
+                  </h2>
+                </div>
+                <a
+                  class="navlink"
+                  href="profile.html"
+                  style="
+                    color: #185034;
+                    font-weight: 600;
+                    font-size: 15px;
+                    text-decoration: none;
+                    padding-top: 4px;
+                  "
+                  >Edit profile</a
+                >
+              </div>
+              <sc-for
+                list="{{ profileRows }}"
+                as="p"
+                hint-placeholder-count="9"
+              >
+                <div
+                  style="
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    gap: 2px 20px;
+                    padding: 12px 0;
+                    border-top: 1px solid #e3e8e4;
+                    font-size: 16px;
+                  "
+                >
+                  <span style="color: #4f6158">{{ p.label }}</span>
+                  <span style="font-weight: 600; text-align: right">{{ p.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+            <!-- Bottom navigation -->
+            <div
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                padding-top: 8px;
+              "
+            >
+              <a
+                class="navlink"
+                href="expenses.html"
+                style="color: #185034; font-weight: 600; font-size: 15px; text-decoration: none"
+                >← Back to expenses</a
+              >
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+                <a
+                  class="cta"
+                  href="https://www.ato.gov.au/"
+                  target="_blank"
+                  rel="noopener"
+                  style="
+                    box-sizing: border-box;
+                    text-decoration: none;
+                    text-align: center;
+                    background: #185034;
+                    color: #ffffff;
+                    border-radius: 12px;
+                    padding: 16px 28px;
+                    font-weight: 600;
+                    font-size: 17px;
+                  "
+                  >Lodge on the ATO website</a
+                >
+                <span style="font-size: 13px; color: #4f6158"
+                  >Deductly doesn't lodge your return.</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Side -->
+          <div
+            style="
+              flex: 1 1 320px;
+              min-width: 0;
+              max-width: 420px;
+              display: flex;
+              flex-direction: column;
+              gap: 24px;
+            "
+          >
+            <!-- Aside: Estimated tax saving -->
+            <aside
+              aria-label="Estimated tax saving"
+              style="
+                box-sizing: border-box;
+                background: #10392c;
+                color: #eaf1ec;
+                border-radius: 18px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 12px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #b9cbc1;
+                "
+                >Estimated tax saving</span
+              >
+
+              <sc-if
+                value="{{ estimateOn }}"
+                hint-placeholder-val="{{ true }}"
+              >
+                <div style="display: flex; flex-direction: column; gap: 14px">
+                  <span
+                    style="
+                      font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                      font-weight: 700;
+                      font-size: 44px;
+                      line-height: 1;
+                      letter-spacing: -0.02em;
+                    "
+                    >{{ savingText }}</span
+                  >
+                  <p style="margin: 0; font-size: 15px; color: #b9cbc1">
+                    Your ready deductions of {{ readyTotal }} take your taxable income from {{
+                    incomeText }} to {{ afterText }}.
+                  </p>
+                  <div>
+                    <sc-for
+                      list="{{ breakdown }}"
+                      as="b"
+                      hint-placeholder-count="2"
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          flex-wrap: wrap;
+                          justify-content: space-between;
+                          gap: 2px 16px;
+                          padding: 10px 0;
+                          border-top: 1px solid rgba(234, 241, 236, 0.2);
+                          font-size: 15px;
+                        "
+                      >
+                        <span style="color: #b9cbc1">{{ b.label }}</span
+                        ><span style="font-weight: 600">{{ b.amount }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <sc-if
+                    value="{{ hasMore }}"
+                    hint-placeholder-val="{{ true }}"
+                    ><p
+                      style="
+                        margin: 0;
+                        font-size: 15px;
+                        color: #eaf1ec;
+                        border-top: 1px solid rgba(234, 241, 236, 0.2);
+                        padding-top: 14px;
+                      "
+                    >
+                      Up to <strong>{{ moreText }}</strong> more once your records are in.
+                    </p></sc-if
+                  >
+                </div>
+              </sc-if>
+              <sc-if
+                value="{{ estimateOff }}"
+                hint-placeholder-val="{{ false }}"
+              >
+                <p style="margin: 0; font-size: 15px; color: #b9cbc1">{{ estimateNote }}</p>
+              </sc-if>
+
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13px;
+                  color: #a9bdb2;
+                  border-top: 1px solid rgba(234, 241, 236, 0.2);
+                  padding-top: 14px;
+                "
+              >
+                {{ footnote }}
+              </p>
+            </aside>
+
+            <div
+              style="
+                box-sizing: border-box;
+                background: #ffffff;
+                border: 1px solid #d3dbd5;
+                border-radius: 18px;
+                padding: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+                  font-weight: 500;
+                  font-size: 12px;
+                  letter-spacing: 0.08em;
+                  text-transform: uppercase;
+                  color: #185034;
+                "
+                >Lodgement dates</span
+              >
+              <span
+                style="
+                  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+                  font-weight: 700;
+                  font-size: 28px;
+                  line-height: 1.1;
+                  letter-spacing: -0.02em;
+                "
+                >{{ dueText }}</span
+              >
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px">
+                <p style="margin: 0"><strong>Lodging yourself:</strong> 31 October 2026.</p>
+                <p style="margin: 0; color: #4f6158">
+                  <strong style="color: #11231c">Through a registered tax agent:</strong> most
+                  people can lodge by 15 May 2027, if they are on the agent's client list before 31
+                  October 2026.
+                </p>
+                <p style="margin: 0; font-size: 13px; color: #4f6158">
+                  Check
+                  <a
+                    href="https://www.ato.gov.au/"
+                    style="color: #185034; font-weight: 600"
+                    >ato.gov.au</a
+                  >
+                  for the dates that apply to you.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </x-dc>
+
+    <script src="js/morphdom.min.js"></script>
+    <script src="js/dc-lite.js"></script>
+    <script src="js/review.js"></script>
+  </body>
+</html>

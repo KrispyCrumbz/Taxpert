@@ -1,0 +1,12 @@
+{
+  "name": "deductly",
+  "private": true,
+  "description": "Australian tax return helper: plan your deductions before you lodge.",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "format": "prettier --write \"**/*.{html,js,json,md}\""
+  },
+  "devDependencies": {
+    "prettier": "3.3.3"
+  }
+}
